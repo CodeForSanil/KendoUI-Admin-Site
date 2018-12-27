@@ -1094,6 +1094,11 @@ form .searchBtn.row {
   .k-edit-form-container .k-edit-label {
     width: 20%;
     font-weight: bold; }
+    .k-edit-form-container .k-edit-label .k-required {
+      margin-right: .2em;
+      font-size: 20px;
+      line-height: 12px;
+      vertical-align: -50%; }
   .k-edit-form-container .k-edit-field {
     padding-right: 5%;
     width: 75%; }
@@ -1120,10 +1125,23 @@ form .searchBtn.row {
   .k-edit-form-container .k-edit-buttons {
     text-align: center; }
   .k-edit-form-container div.k-tooltip-validation {
+    flex-direction: row;
     margin: 0.5em 0 0 0 !important; }
     .k-edit-form-container div.k-tooltip-validation .k-icon {
       margin-right: 4px; }
 
+.k-grid-edit-row strong.k-required {
+  margin-bottom: .3em;
+  margin-left: -6px;
+  margin-right: .2em;
+  font-size: 20px;
+  line-height: 12px;
+  vertical-align: -50%; }
+  .k-grid-edit-row strong.k-required small {
+    margin-left: 3px;
+    font-size: 12px;
+    font-weight: normal;
+    vertical-align: 60%; }
 .k-grid-edit-row .k-switch .k-switch-handle {
   margin-top: -4px; }
 .k-grid-edit-row .k-radio-label,
@@ -1139,7 +1157,8 @@ form .searchBtn.row {
 .k-grid-edit-row .k-colorpicker .k-selected-color {
   width: calc(100% - 8px - 1.42857em); }
 .k-grid-edit-row .k-textarea {
-  width: 100%; }
+  margin-left: calc(-8px - 1px);
+  width: calc(100% + ((8px + 1px) * 2)); }
 .k-grid-edit-row .k-editor {
   border: 1px solid #ccc; }
   .k-grid-edit-row .k-editor .k-editor-toolbar-wrap {
@@ -1149,6 +1168,17 @@ form .searchBtn.row {
       border-width: 0; }
   .k-grid-edit-row .k-editor tr:hover {
     background-color: #fff; }
+.k-grid-edit-row div.k-tooltip-validation {
+  flex-direction: row;
+  margin: 1em 0 0 -9px !important;
+  white-space: nowrap; }
+  .k-grid-edit-row div.k-tooltip-validation .k-icon {
+    margin-right: 4px; }
+  .k-grid-edit-row div.k-tooltip-validation .k-callout-n {
+    left: 16px; }
+.k-grid-edit-row .k-edit-cell {
+  padding-top: 10px;
+  padding-bottom: 15px; }
 
 .k-filter-row .k-filtercell .k-autocomplete {
   border-left-width: 1px; }

@@ -441,7 +441,8 @@ $(function() {
         dataValueField: 'code',
         dataTextField: 'name',
         checkboxes: true,
-        filter: 'contains'
+        filter: 'contains',
+        loadOnDemand: true
     }).data('kendoDropDownTree');
     $('#dropDownTreeMapBtn').kendoButton({
         icon: 'globe-outline',

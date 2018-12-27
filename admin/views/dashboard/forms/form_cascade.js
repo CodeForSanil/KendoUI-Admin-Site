@@ -185,6 +185,7 @@ $(function() {
         checkAll: true,
         checkAllTemplate: '全选',
         height: 500,
+        loadOnDemand: true,
         autoClose: false
     });
     // 省市县乡村五级联动（乡镇和村庄的数据太大，故予以注释处理~）

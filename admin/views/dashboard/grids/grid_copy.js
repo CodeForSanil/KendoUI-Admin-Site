@@ -792,7 +792,11 @@ $(function() {
                                         options.model.set('photo.name', res.response.data.name);
                                         options.model.set('photo.extension', res.response.data.extension);
                                         options.model.set('photo.size', res.response.data.size);
-                                        $('#photoShow').attr('src', res.response.data.url);
+                                        $('#photoShow').attr({
+                                            'src': res.response.data.url,
+                                            'alt': res.response.data.name + res.response.data.extension,
+                                            'title': kendo.toString(res.response.data.size/1000, '0.00') + ' KB'
+                                        });
                                         alertMsg(res.response.msg, 'success');
                                     }
                                     if (res.operation === 'remove') {
@@ -800,7 +804,11 @@ $(function() {
                                         options.model.set('photo.name', 'avatar');
                                         options.model.set('photo.extension', '.png');
                                         options.model.set('photo.size', 53284);
-                                        $('#photoShow').attr('src', 'img/avatar.png');
+                                        $('#photoShow').attr({
+                                            'src': 'img/avatar.png',
+                                            'alt': 'avatar.png',
+                                            'title': '53.28 KB'
+                                        });
                                     }
                                 } else {
                                     $('.k-upload-files').remove();

@@ -378,12 +378,20 @@ function advSearch(dom) {
 // 条件搜索
 function conditionSearch() {
     if ($('#grid').length > 0) {
-        $('#grid').data('kendoGrid').dataSource.read();
-        $('#grid').find('.k-pager-first').click();
+        var dataSource = $('#grid').data('kendoGrid').dataSource;
+        dataSource.read();
+        dataSource.query({
+            page: 1,
+            pageSize: dataSource.pageSize()
+        });
     }
     if ($('#listView').length > 0) {
-        $('#listView').data('kendoListView').dataSource.read();
-        $('#listView').find('.k-pager-first').click();
+        var dataSource = $('#listView').data('kendoListView').dataSource;
+        dataSource.read();
+        dataSource.query({
+            page: 1,
+            pageSize: dataSource.pageSize()
+        });
     }
 }
 

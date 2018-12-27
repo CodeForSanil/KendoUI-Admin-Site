@@ -114,7 +114,8 @@ $(function() {
         },
         placeholder: '树形下拉框',
         dataValueField: 'code',
-        dataTextField: 'name'
+        dataTextField: 'name',
+        loadOnDemand: true
     });
     // 民族
     $('#nation').kendoComboBox({
@@ -250,39 +251,239 @@ $(function() {
                 model: {
                     id: 'id',
                     fields: {
-                        userName: { type: 'string' },
-                        realName: { type: 'string' },
-                        nickName: { type: 'string' },
-                        password: { type: 'string' },
-                        confirmPassword: { type: 'string' },
+                        userName: { type: 'string',
+                            validation: {
+                                userNameRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=userName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-userNameRequired-msg', '请输入用户名！');
+                                    return input.val() !== '';
+                                },
+                                userNamePattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=userName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-userNamePattern-msg', '请输入4-16个大小写字母及数字！');
+                                    return input.val().match(/^[A-Za-z0-9]{4,16}$/) !== null;
+                                }
+                            }
+                        },
+                        realName: { type: 'string',
+                            validation: {
+                                realNameRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=realName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-realNameRequired-msg', '请输入姓名！');
+                                    return input.val() !== '';
+                                },
+                                realNamePattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=realName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-realNamePattern-msg', '请输入1-10个汉字！');
+                                    return input.val().match(/^[\u4E00-\u9FA5]{1,10}$/) !== null;
+                                }
+                            }
+                        },
+                        nickName: { type: 'string',
+                            validation: {
+                                nickNameRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=nickName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-nickNameRequired-msg', '请输入昵称！');
+                                    return input.val() !== '';
+                                },
+                                nickNamePattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=nickName]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-nickNamePattern-msg', '请输入2-20个大小写字母、数字、空格、下划线、中划线及汉字！');
+                                    return input.val().match(/^[A-Za-z0-9\s_\-\u4E00-\u9FA5]{2,20}$/) !== null;
+                                },
+                                nickNameUnique: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=nickName]')) {
+                                        return true;
+                                    }
+                                    var unique = true;
+                                    $.fn.ajaxPost({
+                                        ajaxAsync: false,
+                                        ajaxData: {
+                                            'nickName': input.val()
+                                        },
+                                        succeed: function() {
+                                            unique = true;
+                                        },
+                                        failed: function() {
+                                            unique = false;
+                                        }
+                                    });
+                                    input.attr('data-nickNameUnique-msg', '此昵称已存在，请重新输入！');
+                                    return unique;
+                                }
+                            }
+                        },
+                        password: { type: 'string',
+                            validation: {
+                                passwordRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=password]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-passwordRequired-msg', '请输入密码！');
+                                    return input.val() !== '';
+                                },
+                                passwordPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=password]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-passwordPattern-msg', '请输入6-20个大小写字母及数字！');
+                                    return input.val().match(/^[A-Za-z0-9]{6,20}$/) !== null;
+                                }
+                            }
+                        },
+                        confirmPassword: { type: 'string',
+                            validation: {
+                                confirmPasswordRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=confirmPassword]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-confirmPasswordRequired-msg', '请输入确认密码！');
+                                    return input.val() !== '';
+                                },
+                                matchPassword: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=confirmPassword]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-matchPassword-msg', '两次输入的密码不一致！');
+                                    return (input.val() === $('.k-grid-edit-row [name=password]').val());
+                                }
+                            }
+                        },
                         online: { type: 'boolean' },
-                        gender: { type: 'string' },
+                        gender: { type: 'string',
+                            validation: {
+                                genderRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=gender]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-genderRequired-msg', '请选择性别！');
+                                    return $('.k-grid-edit-row [name=gender]').is(':checked');
+                                }
+                            }
+                        },
                         age: { type: 'number',
-                            defaultValue: null
+                            defaultValue: null,
+                            validation: {
+                                ageRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=age]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-ageRequired-msg', '请输入年龄！');
+                                    return input.val() !== '';
+                                }
+                            }
                         },
                         height: { type: 'number',
-                            defaultValue: null
+                            defaultValue: null,
+                            validation: {
+                                heightRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=height]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-heightRequired-msg', '请输入身高！');
+                                    return input.val() !== '';
+                                }
+                            }
                         },
-                        bloodType: { type: 'string' },
+                        bloodType: { type: 'string',
+                            validation: {
+                                bloodTypeRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=bloodType]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-bloodTypeRequired-msg', '请选择血型！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        },
                         birthday: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(kendo.parseDate(e), 'yyyy-MM-dd');
+                            },
+                            validation: {
+                                birthdayRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=birthday]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-birthdayRequired-msg', '请输入生日！');
+                                    return input.val() !== '';
+                                },
+                                birthdayPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=birthday]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-birthdayPattern-msg', '日期格式不正确！');
+                                    return kendo.parseDate(input.val(), 'yyyy-MM-dd') instanceof Date;
+                                }
                             }
                         },
                         mateBirthday: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(kendo.parseDate(e), 'yyyy-MM-dd');
+                            },
+                            validation: {
+                                mateBirthdayRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=mateBirthday]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-mateBirthdayRequired-msg', '请输入配偶生日！');
+                                    return input.val().match(/^((?!年-月-日).)*$/) !== null;
+                                },
+                                mateBirthdayPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=mateBirthday]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-mateBirthdayPattern-msg', '日期格式不正确！');
+                                    return kendo.parseDate(input.val(), 'yyyy-MM-dd') instanceof Date;
+                                }
                             }
                         },
                         creditCard: { type: 'string',
                             parse: function(e) {
                                 return e.replace(/\s*/g, '');
+                            },
+                            validation: {
+                                creditCardRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=creditCard]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-creditCardRequired-msg', '请输入银行卡！');
+                                    return input.val() !== '';
+                                },
+                                creditCardPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=creditCard]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-creditCardPattern-msg', '请补足位数！');
+                                    return input.val().match(/^[\d\s]{19}$/) !== null;
+                                }
                             }
                         },
                         asset: { type: 'number',
-                            defaultValue: null
+                            defaultValue: null,
+                            validation: {
+                                assetRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=asset]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-assetRequired-msg', '请输入资产！');
+                                    return input.val() !== '';
+                                }
+                            }
                         },
                         nativePlace: { type: 'object',
                             defaultValue: {
@@ -292,6 +493,29 @@ $(function() {
                                 cityName: '',
                                 area: '',
                                 areaName: ''
+                            },
+                            validation: {
+                                provinceRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row #provinceEdit')) {
+                                        return true;
+                                    }
+                                    input.attr('data-provinceRequired-msg', '请选择省份！');
+                                    return input.val() !== '';
+                                },
+                                cityRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row #cityEdit')) {
+                                        return true;
+                                    }
+                                    input.attr('data-cityRequired-msg', '请选择城市！');
+                                    return input.val() !== '';
+                                },
+                                areaRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row #areaEdit')) {
+                                        return true;
+                                    }
+                                    input.attr('data-areaRequired-msg', '请选择区县！');
+                                    return input.val() !== '';
+                                }
                             }
                         },
                         domicile: { type: 'object',
@@ -307,12 +531,37 @@ $(function() {
                                 delete e.selected;
                                 delete e._level;
                                 return e;
+                            },
+                            validation: {
+                                domicileRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=domicile]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-domicileRequired-msg', '请选择居住地！');
+                                    return input.val() !== '';
+                                }
                             }
                         },
                         nation: { type: 'object',
                             defaultValue: {
                                 nation: '',
                                 nationName: ''
+                            },
+                            validation: {
+                                nationRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=nation]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-nationRequired-msg', '请选择民族！');
+                                    return input.val() !== '';
+                                },
+                                nationPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=nation_input]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-nationPattern-msg', '请输入汉字！');
+                                    return input.val() === '' || input.val().match(/^[\u4E00-\u9FA5]+$/) !== null;
+                                }
                             }
                         },
                         zodiac: { type: 'object',
@@ -327,63 +576,255 @@ $(function() {
                                 delete e.zodiacValue4;
                                 delete e.zodiacValue5;
                                 return e;
+                            },
+                            validation: {
+                                zodiacRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=zodiac]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-zodiacRequired-msg', '请选择生肖！');
+                                    return input.val() !== '';
+                                },
+                                zodiacPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=zodiac_input]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-zodiacPattern-msg', '请输入生肖！');
+                                    return input.val() === '' || input.val().match(/^[鼠|牛|虎|兔|龙|蛇|马|羊|猴|鸡|狗|猪]{1}$/) !== null;
+                                }
                             }
                         },
                         language: { type: 'string',
                             parse: function(e) {
                                 return $.trim(e);
+                            },
+                            validation: {
+                                languageRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=language]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-languageRequired-msg', '请输入语言！');
+                                    return input.val() !== '';
+                                }
                             }
                         },
                         education: { type: 'object',
-                            defaultValue: []
+                            defaultValue: [],
+                            validation: {
+                                educationRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=education]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-educationRequired-msg', '请选择教育程度！');
+                                    return $('.k-grid-edit-row [name=education]').is(':checked');
+                                }
+                            }
                         },
                         graduation: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(new Date(e), 'yyyy');
+                            },
+                            validation: {
+                                graduationRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=graduation]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-graduationRequired-msg', '请输入毕业年份！');
+                                    return input.val() !== '';
+                                },
+                                graduationPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=graduation]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-graduationPattern-msg', '年份格式不正确！');
+                                    return kendo.parseDate(input.val(), 'yyyy') instanceof Date;
+                                }
                             }
                         },
                         firstJob: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(new Date(e), 'yyyy-MM');
+                            },
+                            validation: {
+                                firstJobRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=firstJob]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-firstJobRequired-msg', '请输入参加工作年月！');
+                                    return input.val() !== '';
+                                },
+                                firstJobPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=firstJob]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-firstJobPattern-msg', '月份格式不正确！');
+                                    return kendo.parseDate(input.val(), 'yyyy-MM') instanceof Date;
+                                }
                             }
                         },
-                        mobile: { type: 'string' },
-                        email: { type: 'string' },
-                        homepage: { type: 'string' },
+                        mobile: { type: 'string',
+                            validation: {
+                                mobileRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=mobile]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-mobileRequired-msg', '请输入手机！');
+                                    return input.val() !== '';
+                                },
+                                mobilePattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=mobile]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-mobilePattern-msg', '手机格式不正确！');
+                                    return input.val().match(/^1(3[0-9]|4[579]|5[0-35-9]|6[6]|7[0135-8]|8[0-9]|9[89])\d{8}$/) !== null;
+                                }
+                            }
+                        },
+                        email: { type: 'string',
+                            validation: {
+                                emailRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=email]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-emailRequired-msg', '请输入电子邮件！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        },
+                        homepage: { type: 'string',
+                            validation: {
+                                homepageRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=homepage]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-homepageRequired-msg', '请输入个人主页！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        },
                         getUp: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(kendo.parseDate(e), 'HH:mm');
+                            },
+                            validation: {
+                                getUpRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=getUp]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-getUpRequired-msg', '请输入起床时间！');
+                                    return input.val() !== '';
+                                },
+                                getUpPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=getUp]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-getUpPattern-msg', '时间格式不正确！');
+                                    return kendo.parseDate(input.val(), 'HH:mm') instanceof Date;
+                                }
                             }
                         },
                         importantMoment: { type: 'date',
                             defaultValue: null,
                             parse: function(e) {
                                 return kendo.toString(kendo.parseDate(e), 'yyyy-MM-dd HH:mm');
+                            },
+                            validation: {
+                                importantMomentRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=importantMoment]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-importantMomentRequired-msg', '请输入最有意义的时刻！');
+                                    return input.val() !== '';
+                                },
+                                importantMomentPattern: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=importantMoment]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-importantMomentPattern-msg', '日期时间格式不正确！');
+                                    return kendo.parseDate(input.val(), 'yyyy-MM-dd HH:mm') instanceof Date;
+                                }
                             }
                         },
-                        character: { type: 'number' },
+                        character: { type: 'number',
+                            validation: {
+                                characterRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=character]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-characterRequired-msg', '请选择性格！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        },
                         color: {
                             defaultValue: 'rgba(0, 0, 0, 0)',
                             parse: function(e) {
                                 return 'rgba('+ kendo.parseColor(e).r +', '+ kendo.parseColor(e).g +', '+ kendo.parseColor(e).b +', '+ kendo.parseColor(e).a +')';
+                            },
+                            validation: {
+                                colorRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=color]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-colorRequired-msg', '请选择颜色喜好！');
+                                    return input.val() !== '';
+                                }
                             }
                         },
                         constellation: { type: 'object',
-                            defaultValue: []
+                            defaultValue: [],
+                            validation: {
+                                constellationRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=constellation]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-constellationRequired-msg', '请选择相配的星座！');
+                                    return input.val() !== null;
+                                }
+                            }
                         },
-                        summary: { type: 'string' },
+                        summary: { type: 'string',
+                            validation: {
+                                summaryRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=summary]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-summaryRequired-msg', '请输入自我介绍！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        },
                         photo: { type: 'object',
                             defaultValue: {
                                 url: 'img/avatar.png',
                                 name: 'avatar',
                                 extension: '.png',
                                 size: 53284
+                            },
+                            validation: {
+                                photoRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=photo]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-photoRequired-msg', '请上传头像！');
+                                    return $('#photoShow').attr('alt') !== 'avatar.png' && $('#photoShow').attr('title') !== '53.28 KB';
+                                }
                             }
                         },
-                        sign: { type: 'string' }
+                        sign: { type: 'string',
+                            validation: {
+                                signRequired: function(input) {
+                                    if (!input.is('.k-grid-edit-row [name=sign]')) {
+                                        return true;
+                                    }
+                                    input.attr('data-signRequired-msg', '请输入签名！');
+                                    return input.val() !== '';
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -418,15 +859,44 @@ $(function() {
                     }
                 ]
             },
-            { field: 'userName', title: '用户名', width: '80px' },
-            { field: 'realName', title: '姓名', width: '100px' },
-            { field: 'nickName', title: '昵称', width: '110px' },
+            { field: 'userName', title: '用户名', width: '80px',
+                editor: function(container, options) {
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="userName" data-bind="value: '+ options.field +'">')
+                        .appendTo(container);
+                }
+            },
+            { field: 'realName', title: '姓名', width: '100px',
+                editor: function(container, options) {
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="realName" data-bind="value: '+ options.field +'">')
+                        .appendTo(container);
+                }
+            },
+            { field: 'nickName', title: '昵称', width: '110px',
+                editor: function(container, options) {
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="nickName" data-bind="value: '+ options.field +'">')
+                        .appendTo(container);
+                }
+            },
             { field: 'password', title: '密码', width: '100px',
                 template: function(dataItem) {
                     return dataItem.password.replace(dataItem.password.substr(0), '******');
                 },
                 editor: function(container, options) {
-                    $('<input class="k-textbox" type="password" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="password" type="password" data-bind="value: '+ options.field +'">')
+                        .appendTo(container);
+                }
+            },
+            { field: 'confirmPassword', title: '确认密码', width: '100px',
+                template: function(dataItem) {
+                    return dataItem.confirmPassword.replace(dataItem.confirmPassword.substr(0), '******');
+                },
+                editor: function(container, options) {
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="confirmPassword" type="password" data-bind="value: '+ options.field +'">')
                         .appendTo(container);
                 }
             },
@@ -438,7 +908,8 @@ $(function() {
                         '<span class="d-inline-block border border-danger rounded-circle k-notification-error" style="width: 10px; height: 10px;"></span><span class="k-notification-error bg-transparent ml-2">离线</span>' +
                     '# } #',
                 editor: function(container, options) {
-                    $('<input type="checkbox" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">&nbsp;</strong>').appendTo(container);
+                    $('<input name="online" type="checkbox" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoMobileSwitch({
                             onLabel: '',
@@ -452,15 +923,18 @@ $(function() {
                     { text: '女', value: '2' }
                 ],
                 editor: function(container, options) {
-                    $('<input class="k-radio" id="genderEdit1" type="radio" value="1" data-bind="checked: '+ options.field +'"><label class="k-radio-label" for="genderEdit1">男</label>' +
-                        '<input class="k-radio" id="genderEdit2" type="radio" value="2" data-bind="checked: '+ options.field +'"><label class="k-radio-label" for="genderEdit2">女</label>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-radio" id="genderEdit1" name="gender" type="radio" value="1" data-bind="checked: '+ options.field +'"><label class="k-radio-label" for="genderEdit1">男</label>' +
+                        '<input class="k-radio" id="genderEdit2" name="gender" type="radio" value="2" data-bind="checked: '+ options.field +'"><label class="k-radio-label" for="genderEdit2">女</label>' +
+                        '<span class="k-invalid-msg" data-for="gender"></span>')
                         .appendTo(container);
                 }
             },
             { field: 'age', title: '年龄', width: '80px',
                 template: '#= age # 岁',
                 editor: function(container, options) {
-                    $('<input type="number" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="age" type="number" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoNumericTextBox({
                             format: 'n0',
@@ -468,12 +942,15 @@ $(function() {
                             min: 1,
                             max: 100
                         });
+                    $('<span class="k-invalid-msg" data-for="age"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'height', title: '身高', width: '100px',
                 template: '#= kendo.toString(height, "0.00") # m',
                 editor: function(container, options) {
-                    $('<input type="number" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="height" type="number" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoNumericTextBox({
                             format: '0.00 m',
@@ -482,9 +959,11 @@ $(function() {
                             min: 0.30,
                             max: 3.00
                         });
+                    $('<span class="k-invalid-msg" data-for="height"></span>')
+                        .appendTo(container);
                 }
             },
-            { field: 'bloodType', title: '血型', width: '110px',
+            { field: 'bloodType', title: '血型', width: '130px',
                 values: [
                     { text: 'A 型', value: '1' },
                     { text: 'B 型', value: '2' },
@@ -493,7 +972,8 @@ $(function() {
                     { text: '其他', value: '5' }
                 ],
                 editor: function(container, options) {
-                    $('<select data-bind="value: '+ options.field +'"></select>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<select name="bloodType" data-bind="value: '+ options.field +'"></select>')
                         .appendTo(container)
                         .kendoDropDownList({
                             dataSource: {
@@ -509,11 +989,14 @@ $(function() {
                             dataValueField: 'value',
                             dataTextField: 'text'
                         });
+                    $('<span class="k-invalid-msg" data-for="bloodType"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'birthday', title: '生日', width: '140px',
                 editor: function(container, options) {
-                    $('<input type="date" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="birthday" type="date" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDatePicker({
                             format: 'yyyy-MM-dd',
@@ -521,17 +1004,22 @@ $(function() {
                             min: new Date(1920, 0, 1),
                             max: new Date()
                         });
+                    $('<span class="k-invalid-msg" data-for="birthday"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'mateBirthday', title: '配偶生日', width: '110px',
                 editor: function(container, options) {
-                    $('<input type="date" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="mateBirthday" type="date" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDateInput({
                             format: 'yyyy-MM-dd',
                             min: new Date(1920, 0, 1),
                             max: new Date()
                         });
+                    $('<span class="k-invalid-msg" data-for="mateBirthday"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'creditCard', title: '银行卡', width: '170px',
@@ -539,29 +1027,36 @@ $(function() {
                     return dataItem.creditCard.replace(dataItem.creditCard.substr(2, 12), '** **** **** **');
                 },
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="creditCard" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoMaskedTextBox({
                             mask: '0000 0000 0000 0000'
                         });
+                    $('<span class="k-invalid-msg" data-for="creditCard"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'asset', title: '资产', width: '170px',
                 format: '{0:c}',
                 editor: function(container, options) {
-                    $('<input type="number" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="asset" type="number" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoNumericTextBox({
                             format: 'c',
                             decimals: 2,
                             step: 10000
                         });
+                    $('<span class="k-invalid-msg" data-for="asset"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'nativePlace', title: '籍贯', width: '250px',
                 template: '#= nativePlace.provinceName # - #= nativePlace.cityName # - #= nativePlace.areaName #',
                 editor: function(container, options) {
-                    $('<select class="mb-2" id="provinceEdit" data-bind="value: '+ options.field +'"></select>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<select class="mb-2" id="provinceEdit" name="nativePlace" data-bind="value: '+ options.field +'"></select>')
                         .appendTo(container)
                         .kendoDropDownList({
                             dataSource: {
@@ -586,7 +1081,7 @@ $(function() {
                             dataValueField: 'province',
                             dataTextField: 'provinceName'
                         });
-                    $('<select class="mb-2" id="cityEdit" data-bind="value: '+ options.field +'"></select>')
+                    $('<select class="mb-2" id="cityEdit" name="nativePlace" data-bind="value: '+ options.field +'"></select>')
                         .appendTo(container)
                         .kendoDropDownList({
                             dataSource: {
@@ -613,7 +1108,7 @@ $(function() {
                             dataValueField: 'city',
                             dataTextField: 'cityName'
                         });
-                    $('<select id="areaEdit" data-bind="value: '+ options.field +'"></select>')
+                    $('<select id="areaEdit" name="nativePlace" data-bind="value: '+ options.field +'"></select>')
                         .appendTo(container)
                         .kendoDropDownList({
                             dataSource: {
@@ -640,12 +1135,15 @@ $(function() {
                             dataValueField: 'area',
                             dataTextField: 'areaName'
                         });
+                    $('<span class="k-invalid-msg" data-for="nativePlace"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'domicile', title: '居住地', width: '240px',
                 template: '#= domicile.name #',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="domicile" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDropDownTree({
                             dataSource: {
@@ -673,12 +1171,15 @@ $(function() {
                             dataValueField: 'code',
                             dataTextField: 'name'
                         });
+                    $('<span class="k-invalid-msg" data-for="domicile"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'nation', title: '民族', width: '140px',
                 template: '#= nation.nationName #',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="nation" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoComboBox({
                             dataSource: {
@@ -703,12 +1204,15 @@ $(function() {
                             dataTextField: 'nationName',
                             suggest: true
                         });
+                    $('<span class="k-invalid-msg" data-for="nation"></span><span class="k-invalid-msg" data-for="nation_input"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'zodiac', title: '生肖', width: '90px',
                 template: '#= zodiac.zodiacName #',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="zodiac" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoMultiColumnComboBox({
                             dataSource: {
@@ -744,11 +1248,14 @@ $(function() {
                             minLength: 4,
                             suggest: true
                         });
+                    $('<span class="k-invalid-msg" data-for="zodiac"></span><span class="k-invalid-msg" data-for="zodiac_input"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'language', title: '语言', width: '240px',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="language" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoAutoComplete({
                             dataSource: {
@@ -773,6 +1280,8 @@ $(function() {
                             suggest: true,
                             separator: ' '
                         });
+                    $('<span class="k-invalid-msg" data-for="language"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'education', title: '教育程度', width: '210px',
@@ -799,21 +1308,24 @@ $(function() {
                         '# } #' +
                     '# } #',
                 editor: function(container, options) {
-                    $('<input class="k-checkbox" id="educationEdit1" type="checkbox" value="1" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit1">小学</label>' +
-                        '<input class="k-checkbox" id="educationEdit2" type="checkbox" value="2" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit2">初中</label>' +
-                        '<input class="k-checkbox" id="educationEdit3" type="checkbox" value="3" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit3">高中</label>' +
-                        '<input class="k-checkbox" id="educationEdit4" type="checkbox" value="4" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit4">中专</label>' +
-                        '<input class="k-checkbox" id="educationEdit5" type="checkbox" value="5" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit5">大专</label>' +
-                        '<input class="k-checkbox" id="educationEdit6" type="checkbox" value="6" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit6">本科</label>' +
-                        '<input class="k-checkbox" id="educationEdit7" type="checkbox" value="7" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit7">硕士</label>' +
-                        '<input class="k-checkbox" id="educationEdit8" type="checkbox" value="8" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit8">博士</label>' +
-                        '<input class="k-checkbox" id="educationEdit9" type="checkbox" value="9" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit9">其他</label>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-checkbox" id="educationEdit1" name="education" type="checkbox" value="1" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit1">小学</label>' +
+                        '<input class="k-checkbox" id="educationEdit2" name="education" type="checkbox" value="2" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit2">初中</label>' +
+                        '<input class="k-checkbox" id="educationEdit3" name="education" type="checkbox" value="3" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit3">高中</label>' +
+                        '<input class="k-checkbox" id="educationEdit4" name="education" type="checkbox" value="4" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit4">中专</label>' +
+                        '<input class="k-checkbox" id="educationEdit5" name="education" type="checkbox" value="5" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit5">大专</label>' +
+                        '<input class="k-checkbox" id="educationEdit6" name="education" type="checkbox" value="6" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit6">本科</label>' +
+                        '<input class="k-checkbox" id="educationEdit7" name="education" type="checkbox" value="7" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit7">硕士</label>' +
+                        '<input class="k-checkbox" id="educationEdit8" name="education" type="checkbox" value="8" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit8">博士</label>' +
+                        '<input class="k-checkbox" id="educationEdit9" name="education" type="checkbox" value="9" data-bind="checked: '+ options.field +'"><label class="k-checkbox-label" for="educationEdit9">其他</label>' +
+                        '<span class="k-invalid-msg" data-for="education"></span>')
                         .appendTo(container);
                 }
             },
             { field: 'graduation', title: '毕业年份', width: '90px',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="graduation" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDatePicker({
                             start: 'decade',
@@ -821,11 +1333,14 @@ $(function() {
                             format: 'yyyy',
                             footer: '今年：#= kendo.toString(data, "yyyy年") #'
                         });
+                    $('<span class="k-invalid-msg" data-for="graduation"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'firstJob', title: '参加工作年月', width: '110px',
                 editor: function(container, options) {
-                    $('<input type="month" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="firstJob" type="month" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDatePicker({
                             start: 'year',
@@ -833,43 +1348,54 @@ $(function() {
                             format: 'yyyy-MM',
                             footer: '当月：#= kendo.toString(data, "yyyy年MM月") #'
                         });
+                    $('<span class="k-invalid-msg" data-for="firstJob"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'mobile', title: '手机', width: '120px',
                 editor: function(container, options) {
-                    $('<input class="k-textbox" type="tel" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="mobile" type="tel" data-bind="value: '+ options.field +'">')
                         .appendTo(container);
                 }
             },
             { field: 'email', title: '电子邮件', width: '180px',
                 editor: function(container, options) {
-                    $('<input class="k-textbox" type="email" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="email" type="email" data-bind="value: '+ options.field +'" data-email-msg="电子邮件格式不正确！">')
                         .appendTo(container);
                 }
             },
             { field: 'homepage', title: '个人主页', width: '190px',
                 editor: function(container, options) {
-                    $('<input class="k-textbox" type="url" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input class="k-textbox" name="homepage" type="url" data-bind="value: '+ options.field +'" data-url-msg="网址格式不正确！">')
                         .appendTo(container);
                 }
             },
             { field: 'getUp', title: '起床时间', width: '90px',
                 editor: function(container, options) {
-                    $('<input type="time" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="getUp" type="time" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoTimePicker({
                             format: 'HH:mm'
                         });
+                    $('<span class="k-invalid-msg" data-for="getUp"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'importantMoment', title: '最有意义的时刻', width: '200px',
                 editor: function(container, options) {
-                    $('<input type="datetime" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="importantMoment" type="datetime" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoDateTimePicker({
                             format: 'yyyy-MM-dd HH:mm',
                             footer: '现在：#= kendo.toString(data, "yyyy年MM月dd日 HH:mm") #'
                         });
+                    $('<span class="k-invalid-msg" data-for="importantMoment"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'character', title: '性格', width: '200px',
@@ -887,7 +1413,8 @@ $(function() {
                     { text: '超级内向', value: -10 }
                 ],
                 editor: function(container, options) {
-                    $('<input type="range" data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="character" type="range" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoSlider({
                             decreaseButtonTitle: '内向',
@@ -900,17 +1427,22 @@ $(function() {
                                 template: '# if(value==10){ #超级开朗# }else if(value==8){ #非常开朗# }else if(value==6){ #很开朗# }else if(value==4){ #比较开朗# }else if(value==2){ #有点开朗# }else if(value==-2){ #有点内向# }else if(value==-4){ #比较内向# }else if(value==-6){ #很内向# }else if(value==-8){ #非常内向# }else if(value==-10){ #超级内向# }else{ #普通# } #'
                             }
                         });
+                    $('<span class="k-invalid-msg" data-for="character"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'color', title: '颜色喜好', width: '90px',
                 template: '<span style="display: inline-block; width: 100%; height: 24px; background: #= color #; border: 1px solid \\#c5c5c5; border-radius: 4px; vertical-align: middle;"></span>',
                 editor: function(container, options) {
-                    $('<input data-bind="value: '+ options.field +'">')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<input name="color" data-bind="value: '+ options.field +'">')
                         .appendTo(container)
                         .kendoColorPicker({
                             opacity: true,
                             buttons: false
                         });
+                    $('<span class="k-invalid-msg" data-for="color"></span>')
+                        .appendTo(container);
                 }
             },
             { field: 'constellation', title: '相配的星座', width: '270px',
@@ -943,7 +1475,8 @@ $(function() {
                         '# } #' +
                     '# } #',
                 editor: function(container, options) {
-                    $('<select multiple data-bind="value: '+ options.field +'"></select>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<select name="constellation" multiple data-bind="value: '+ options.field +'"></select>')
                         .appendTo(container)
                         .kendoMultiSelect({
                             dataSource: {
@@ -968,21 +1501,26 @@ $(function() {
                             autoClose: false,
                             valuePrimitive: true
                         });
+                    $('<span class="k-invalid-msg" data-for="constellation"></span>')
+                        .appendTo(container);
                 }
             },
-            { field: 'summary', title: '自我介绍', width: '320px',
+            { field: 'summary', title: '自我介绍', width: '300px',
                 editor: function(container, options) {
-                    $('<textarea class="k-textarea" data-bind="value: '+ options.field +'"></textarea>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<textarea class="k-textarea" name="summary" data-bind="value: '+ options.field +'"></textarea>')
                         .appendTo(container);
                 }
             },
             { field: 'photo', title: '头像', width: '320px',
                 template: '<a href="javascript:showBigPic(\'#= photo.url #\');"><img class="w-10 rounded-circle" src="#= photo.url #" alt="#= photo.name ##= photo.extension #"></a><small class="ml-2 text-muted">[#= kendo.toString(photo.size/1000, "0.00") # KB]</small>',
                 editor: function(container, options) {
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
                     $('<div class="media">' +
                             '<img class="img-thumbnail w-15 mr-2" id="photoShow" src="'+ options.model.photo.url +'" alt="'+ options.model.photo.name + options.model.photo.extension +'" title="'+ kendo.toString(options.model.photo.size/1000, "0.00") +' KB">' +
                             '<div class="media-body">' +
-                                '<input id="photoEdit" type="file">' +
+                                '<input id="photoEdit" name="photo" type="file">' +
+                                '<span class="k-invalid-msg" data-for="photo"></span>' +
                             '</div>' +
                         '</div>')
                         .appendTo(container);
@@ -1011,7 +1549,11 @@ $(function() {
                                         options.model.set('photo.name', res.response.data.name);
                                         options.model.set('photo.extension', res.response.data.extension);
                                         options.model.set('photo.size', res.response.data.size);
-                                        $('#photoShow').attr('src', res.response.data.url);
+                                        $('#photoShow').attr({
+                                            'src': res.response.data.url,
+                                            'alt': res.response.data.name + res.response.data.extension,
+                                            'title': kendo.toString(res.response.data.size/1000, '0.00') + ' KB'
+                                        });
                                         alertMsg(res.response.msg, 'success');
                                     }
                                     if (res.operation === 'remove') {
@@ -1019,7 +1561,11 @@ $(function() {
                                         options.model.set('photo.name', 'avatar');
                                         options.model.set('photo.extension', '.png');
                                         options.model.set('photo.size', 53284);
-                                        $('#photoShow').attr('src', 'img/avatar.png');
+                                        $('#photoShow').attr({
+                                            'src': 'img/avatar.png',
+                                            'alt': 'avatar.png',
+                                            'title': '53.28 KB'
+                                        });
                                     }
                                 } else {
                                     $('.k-upload-files').remove();
@@ -1032,7 +1578,8 @@ $(function() {
             { field: 'sign', title: '签名', width: '600px',
                 template: '#= sign #',
                 editor: function(container, options) {
-                    $('<textarea data-bind="value: '+ options.field +'"></textarea>')
+                    $('<strong class="k-required d-block">*<small>必填</small></strong>').appendTo(container);
+                    $('<textarea name="sign" data-bind="value: '+ options.field +'"></textarea>')
                         .appendTo(container)
                         .kendoEditor({
                             tools: [
@@ -1053,6 +1600,8 @@ $(function() {
                                 'viewHtml'
                             ]
                         });
+                    $('<span class="k-invalid-msg" data-for="sign"></span>')
+                        .appendTo(container);
                 }
             }
         ],
